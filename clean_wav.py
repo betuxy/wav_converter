@@ -10,7 +10,7 @@ source_path = expanduser("~/Downloads/bandcamp_collection_wav_bak/bandcamp_colle
 dest_path = expanduser("~/Desktop/bandcamp_processed_wav")
 
 incomplete_files = glob(path_join(source_path, '**', '*download'), recursive=True)
-all_wav_files = glob(path_join(source_path, '**', '*download'), recursive=True)
+all_wav_files = glob(path_join(source_path, '**', '*wav'), recursive=True)
 
 complete_wav_files = [
             x for x in all_wav_files if not any(x in string for string in incomplete_files)
