@@ -25,7 +25,9 @@ def convert_seconds(seconds):
 
 def convert_music(source_path, dest_path):
     start_time = round(default_timer())
+    convert_button.config(state=tk.DISABLED)
     num_errors = 0
+    num_success = 0
     error_log = []
 
     incomplete_files = glob(path_join(source_path, '**', '*.download'), recursive=True)
@@ -35,7 +37,7 @@ def convert_music(source_path, dest_path):
                 x for x in all_wav_files if not any(x in string for string in incomplete_files)
             ]
 
-    for file in complete_wav_files:
+    for file in sorted(complete_wav_files):
         filename = basename(file)
 
         try:
@@ -54,17 +56,29 @@ def convert_music(source_path, dest_path):
 
         except CalledProcessError as cpe:
             num_errors += 1
-            error_log.append(f"{filename}: {cpe.stderr.decode('utf-8')}")
+            error_log.append(f"{filename}")     #: {cpe.stderr.decode('utf-8')}")
+            continue
+
+        except FileNotFoundError:
+            num_errors += 1
+            error_log.append(f"{filename}")
+            continue
+
+        num_success += 1
 
     end_time = round(default_timer())
     output_text.config(state=tk.NORMAL)
     output_text.insert(tk.END, "\n=== Finished Processing ===\n")
     output_text.insert(tk.END, f"Time spent: {convert_seconds(end_time - start_time)}\n")
-    output_text.insert(tk.END, f"Number of files processed: {len(complete_wav_files)}\n")
-    output_text.insert(tk.END, f"Number of Errors: {num_errors}")
+    output_text.insert(tk.END, f"Found files: {len(complete_wav_files)}\n")
+    output_text.insert(tk.END, f"Successful: {num_success}\n")
+    output_text.insert(tk.END, f"Erroneous: {num_errors}\n")
+
     if num_errors > 0:
+        output_text.insert(tk.END, "\nFailed files:\n")
         output_text.insert(tk.END, "\n".join(error_log))
     output_text.config(state=tk.DISABLED)
+    convert_button.config(state=tk.NORMAL)
 
 
 def browse_button(folder_var):
@@ -73,10 +87,21 @@ def browse_button(folder_var):
 
 
 def convert_button():
+    # Clear the text in the output text widget
+    output_text.config(state=tk.NORMAL)
+    output_text.delete(1.0, tk.END)
+    output_text.config(state=tk.DISABLED)
+
     input_folder = input_folder_var.get()
     output_folder = output_folder_var.get()
+
     # Run the conversion process in a separate thread
     threading.Thread(target=convert_music, args=(input_folder, output_folder)).start()
+
+
+def exit_button():
+    root.destroy()  # Close the Tkinter window
+    exit(0)  # Exit the Python program
 
 
 # Create the main tkinter window
@@ -86,8 +111,10 @@ root.title("Music File Converter")
 # Calculate the position to center the window on the screen
 window_width = 1000
 window_height = 800
+
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
+
 x_coordinate = (screen_width - window_width) // 2
 y_coordinate = (screen_height - window_height) // 2
 
