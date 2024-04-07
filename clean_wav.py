@@ -95,7 +95,7 @@ def convert_music(source_path, dest_path):
     output_text.insert(tk.END, f"Time spent: {convert_seconds(end_time - start_time)}\n")
     output_text.insert(tk.END, f"Found files: {len(complete_wav_files)}\n")
     output_text.insert(tk.END, f"Successful: {num_success}\n")
-    output_text.insert(tk.END, f"Erroneous: {num_errors}\n")
+    output_text.insert(tk.END, f"Failed: {num_errors}\n")
 
     if num_errors > 0:
         output_text.insert(tk.END, "\nFailed files:\n")
