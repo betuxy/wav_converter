@@ -134,20 +134,28 @@ input_frame.pack(padx=padding, pady=padding)
 
 # Input folder selection
 input_folder_var = tk.StringVar()
+
 input_folder_label = tk.Label(input_frame, text="Input Folder:", font=font_style)
 input_folder_label.grid(row=0, column=0, sticky="w", padx=padding, pady=padding)
+
 input_folder_entry = tk.Entry(input_frame, textvariable=input_folder_var, font=font_style, width=50)
 input_folder_entry.grid(row=0, column=1, padx=padding, pady=padding)
-input_folder_button = tk.Button(input_frame, text="Browse", command=lambda: browse_button(input_folder_var), font=font_style)
+
+input_folder_button = tk.Button(
+    input_frame, text="Browse", command=lambda: browse_button(input_folder_var), font=font_style)
 input_folder_button.grid(row=0, column=2, padx=padding, pady=padding)
 
 # Output folder selection
 output_folder_var = tk.StringVar()
+
 output_folder_label = tk.Label(input_frame, text="Output Folder:", font=font_style)
 output_folder_label.grid(row=1, column=0, sticky="w", padx=padding, pady=padding)
+
 output_folder_entry = tk.Entry(input_frame, textvariable=output_folder_var, font=font_style, width=50)
 output_folder_entry.grid(row=1, column=1, padx=padding, pady=padding)
-output_folder_button = tk.Button(input_frame, text="Browse", command=lambda: browse_button(output_folder_var), font=font_style)
+
+output_folder_button = tk.Button(
+    input_frame, text="Browse", command=lambda: browse_button(output_folder_var), font=font_style)
 output_folder_button.grid(row=1, column=2, padx=padding, pady=padding)
 
 # Button frame to contain Convert and Exit buttons
@@ -161,11 +169,17 @@ button_padding_x = 30
 button_padding_y = 15
 
 # Convert button
-convert_button = tk.Button(button_frame, text="Convert", command=convert_button, font=button_font, width=button_width, height=button_height)
+convert_button = tk.Button(
+    button_frame, text="Convert", command=convert_button,
+    font=button_font, width=button_width, height=button_height
+)
 convert_button.pack(side=tk.LEFT, padx=button_padding_x, pady=button_padding_y)
 
 # Exit button
-exit_button = tk.Button(button_frame, text="Exit", command=exit_button, font=button_font, width=button_width, height=button_height)
+exit_button = tk.Button(
+    button_frame, text="Exit", command=exit_button,
+    font=button_font, width=button_width, height=button_height
+)
 exit_button.pack(side=tk.LEFT, padx=button_padding_x, pady=button_padding_y)
 
 # Output text widget
