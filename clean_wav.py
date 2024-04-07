@@ -149,12 +149,26 @@ output_folder_entry.grid(row=1, column=1, padx=padding, pady=padding)
 output_folder_button = tk.Button(input_frame, text="Browse", command=lambda: browse_button(output_folder_var), font=font_style)
 output_folder_button.grid(row=1, column=2, padx=padding, pady=padding)
 
+# Button frame to contain Convert and Exit buttons
+button_frame = tk.Frame(root)
+button_frame.pack(pady=padding)
+
+button_font = ("Arial Rounded MT Bold", 20)
+button_width = 15
+button_height = 1
+button_padding_x = 30
+button_padding_y = 15
+
 # Convert button
-convert_button = tk.Button(root, text="Convert", command=convert_button, font=("Arial Rounded MT Bold", 20), width=20, height=2)
-convert_button.pack(pady=10)
+convert_button = tk.Button(button_frame, text="Convert", command=convert_button, font=button_font, width=button_width, height=button_height)
+convert_button.pack(side=tk.LEFT, padx=button_padding_x, pady=button_padding_y)
+
+# Exit button
+exit_button = tk.Button(button_frame, text="Exit", command=exit_button, font=button_font, width=button_width, height=button_height)
+exit_button.pack(side=tk.LEFT, padx=button_padding_x, pady=button_padding_y)
 
 # Output text widget
-output_text = tk.Text(root, font=font_style, state=tk.DISABLED)
+output_text = tk.Text(root, font=font_style)
 output_text.pack(fill=tk.BOTH, expand=True, padx=padding, pady=padding)
 
 # Start the GUI event loop
