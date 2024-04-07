@@ -41,7 +41,7 @@ def convert_music(source_path, dest_path):
         filename = basename(file)
 
         try:
-            res = run(
+            run(
                 [
                     "/opt/homebrew/bin/ffmpeg",
                     "-y", "-loglevel", "error",
@@ -54,9 +54,9 @@ def convert_music(source_path, dest_path):
             output_text.insert(tk.END, f"{filename}\n")
             output_text.config(state=tk.DISABLED)
 
-        except CalledProcessError as cpe:
+        except CalledProcessError:
             num_errors += 1
-            error_log.append(f"{filename}")     #: {cpe.stderr.decode('utf-8')}")
+            error_log.append(f"{filename}")
             continue
 
         except FileNotFoundError:
