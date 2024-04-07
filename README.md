@@ -36,3 +36,7 @@ create-dmg \
 	"dist/WAVConverter.dmg" \
 	"dist/dmg/"
 ```
+
+## Credits
+The icon is from [Jeremiah Foster](https://www.jeremiahfoster.com/).<br>
+It is licensed under CC v4.0 and can be found [here](https://icon-icons.com/de/symbol/sound-Wandler/104656).
