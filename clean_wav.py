@@ -4,9 +4,29 @@ from subprocess import run, CalledProcessError
 import tkinter as tk
 from tkinter import filedialog
 import threading
+from timeit import default_timer
+
+
+def convert_seconds(seconds):
+    hours = str(seconds // 3600) + "h"
+    minutes = str((seconds % 3600) // 60) + "m"
+    seconds = str(seconds % 60) + "s"
+
+    if hours.startswith("0"):
+        if minutes.startswith("0"):
+            return f"{seconds}"
+
+        else:
+            return f"{minutes} {seconds}"
+
+    else:
+        return f"{hours:<3} {minutes:<3} {seconds:<3}"
 
 
 def convert_music(source_path, dest_path):
+    start_time = round(default_timer())
+    num_errors = 0
+    error_log = []
 
     incomplete_files = glob(path_join(source_path, '**', '*.download'), recursive=True)
     all_wav_files = glob(path_join(source_path, '**', '*.wav'), recursive=True)
@@ -30,17 +50,20 @@ def convert_music(source_path, dest_path):
 
             output_text.config(state=tk.NORMAL)
             output_text.insert(tk.END, f"{filename}\n")
-            # output_text.update_idletasks()
             output_text.config(state=tk.DISABLED)
 
         except CalledProcessError as cpe:
-            print(f"[ERROR] Failed processing file {filename}")
-            print(f"stderr: {cpe.stderr.decode('utf-8')}\n")
+            num_errors += 1
+            error_log.append(f"{filename}: {cpe.stderr.decode('utf-8')}")
 
+    end_time = round(default_timer())
     output_text.config(state=tk.NORMAL)
-    output_text.insert(tk.END, "\n=== Finished Processing ===")
-    output_text.insert(tk.END, f"Time spent: {default_timer() - start_time}")
-
+    output_text.insert(tk.END, "\n=== Finished Processing ===\n")
+    output_text.insert(tk.END, f"Time spent: {convert_seconds(end_time - start_time)}\n")
+    output_text.insert(tk.END, f"Number of files processed: {len(complete_wav_files)}\n")
+    output_text.insert(tk.END, f"Number of Errors: {num_errors}")
+    if num_errors > 0:
+        output_text.insert(tk.END, "\n".join(error_log))
     output_text.config(state=tk.DISABLED)
 
 
