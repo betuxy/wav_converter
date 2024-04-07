@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from glob import glob
 from os.path import basename, join as path_join
 from subprocess import run, CalledProcessError
