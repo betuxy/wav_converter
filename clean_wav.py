@@ -102,6 +102,8 @@ def convert_music(source_path, dest_path):
     if num_errors > 0:
         output_text.insert(tk.END, "\nFailed files:\n")
         output_text.insert(tk.END, "\n".join(error_log))
+
+    output_text.see(tk.END)
     output_text.config(state=tk.DISABLED)
     convert_button.config(state=tk.NORMAL)
 
