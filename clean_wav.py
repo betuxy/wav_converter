@@ -76,6 +76,7 @@ def convert_music(source_path, dest_path):
 
             output_text.config(state=tk.NORMAL)
             output_text.insert(tk.END, f"{filename}\n")
+            output_text.see(tk.END)
             output_text.config(state=tk.DISABLED)
 
         except CalledProcessError:
