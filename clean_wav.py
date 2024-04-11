@@ -56,11 +56,12 @@ def convert_music(source_path, dest_path):
     incomplete_files = glob(path_join(source_path, '**', '*.download'), recursive=True)
     all_wav_files = glob(path_join(source_path, '**', '*.wav'), recursive=True)
 
-    complete_wav_files = [
-                x for x in all_wav_files if not any(x in string for string in incomplete_files)
-            ]
+    complete_wav_files = {}
+    for x in all_wav_files:
+        if not any(x in string for string in incomplete_files):
+            complete_wav_files.setdefault(x.split('/')[-1], x)
 
-    for file in sorted(complete_wav_files):
+    for file in sorted(complete_wav_files.values()):
         filename = basename(file)
 
         try:

@@ -19,6 +19,8 @@ Install the latest dmg file.
 Feel free to inspect the code and compile it yourself
 ```
 # In the root of the git repo
+rm -rf build dist WAVConverter.spec
+
 pyinstaller --name "WAVConverter" --icon icon.png --windowed clean_wav.py
 
 mkdir -p dist/dmg
