@@ -272,6 +272,7 @@ convert_button = tk.Button(
     font=BUTTON_FONT, width=BUTTON_WIDTH, height=BUTTON_HEIGHT
 )
 convert_button.pack(side=tk.LEFT, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y)
+
 # Exit button
 exit_button = tk.Button(
     button_frame, text="Exit", command=exit_button,
