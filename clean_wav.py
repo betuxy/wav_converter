@@ -9,10 +9,45 @@ from glob import glob
 from os.path import basename, join as path_join
 from subprocess import run, CalledProcessError
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import threading
 from timeit import default_timer
 from sys import exit as sys_exit
+from os import remove
+
+
+def delete_error_files(error_log):
+    """
+    Delete files listed in the error log.
+
+    Parameters:
+    - error_log (list): A list containing dictionaries with 'file' key representing the file path.
+    """
+    for error in error_log:
+        try:
+            remove(error['file'])
+            output_text.insert(tk.END, f"Deleted: {error['file']}\n")
+            output_text.see(tk.END)
+        except Exception as e:
+            output_text.insert(tk.END, f"Error deleting {error['file']}: {e}\n")
+            output_text.see(tk.END)
+
+
+def delete_error_files_popup(error_log):
+    """
+    Display a popup window to confirm deleting files listed in the error log.
+
+    Parameters:
+    - error_log (list): A list containing dictionaries with 'file' key representing the file path.
+    """
+    files_to_delete = "\n".join([f["file"] for f in error_log])
+    confirmation = messagebox.askquestion(
+        "Confirmation",
+        f"Do you want to delete the erroneous files?\n"
+        f"The following files will be deleted:\n\n{files_to_delete}"
+    )
+    if confirmation == 'yes':
+        delete_error_files(error_log)
 
 
 def convert_seconds(seconds):
@@ -79,14 +114,14 @@ def convert_music(source_path, dest_path):
             output_text.see(tk.END)
             output_text.config(state=tk.DISABLED)
 
-        except CalledProcessError:
+        except CalledProcessError as cpe:
             num_errors += 1
-            error_log.append(f"{filename}")
-            continue
-
-        except FileNotFoundError:
-            num_errors += 1
-            error_log.append(f"{filename}")
+            if 'Invalid data' in cpe.stderr.decode("utf-8"):
+                error_log.append({"file": file, "msg": f"Invalid data: {filename}"})
+            else:
+                error_log.append(
+                    {"file": file, "msg": f"{filename}: {cpe.stderr.decode("utf-8")}"}
+                )
             continue
 
         num_success += 1
@@ -101,7 +136,20 @@ def convert_music(source_path, dest_path):
 
     if num_errors > 0:
         output_text.insert(tk.END, "\nFailed files:\n")
-        output_text.insert(tk.END, "\n".join(error_log))
+        output_text.insert(tk.END, "\n".join([x['msg'] for x in error_log]) + "\n")
+        output_text.see(tk.END)
+        delete_error_files_popup(error_log)
+
+        # output_text.insert(
+        #     tk.END, "\nTo delete the erroneous files, click the 'Delete Error Files' button.\n"
+        # )
+        # delete_button.config(state=tk.NORMAL)
+        # delete_button['command'] = lambda: delete_error_files_popup(error_log)
+
+        # output_text.insert(
+        #     tk.END, "\nTo delete the erroneous files, execute this command in a terminal:\n"
+        # )
+        # output_text.insert(tk.END, "rm " + " ".join([x['file'] for x in error_log]))
 
     output_text.see(tk.END)
     output_text.config(state=tk.DISABLED)
@@ -224,7 +272,6 @@ convert_button = tk.Button(
     font=BUTTON_FONT, width=BUTTON_WIDTH, height=BUTTON_HEIGHT
 )
 convert_button.pack(side=tk.LEFT, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y)
-
 # Exit button
 exit_button = tk.Button(
     button_frame, text="Exit", command=exit_button,
