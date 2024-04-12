@@ -16,7 +16,7 @@ from sys import exit as sys_exit
 from os import remove
 
 
-def delete_error_files(error_log):
+def delete_error_files(error_log, popup_window):
     """
     Delete files listed in the error log.
 
@@ -26,8 +26,6 @@ def delete_error_files(error_log):
     for error in error_log:
         try:
             remove(error['file'])
-            output_text.insert(tk.END, f"Deleted: {error['file']}\n")
-            output_text.see(tk.END)
         except Exception as e:
             output_text.insert(tk.END, f"Error deleting {error['file']}: {e}\n")
             output_text.see(tk.END)
@@ -35,19 +33,66 @@ def delete_error_files(error_log):
 
 def delete_error_files_popup(error_log):
     """
-    Display a popup window to confirm deleting files listed in the error log.
+    Open a new window to confirm deleting files listed in the error log.
 
     Parameters:
     - error_log (list): A list containing dictionaries with 'file' key representing the file path.
     """
+    # Create a new window for the confirmation
+    popup_window = tk.Toplevel(root)
+    popup_window.title("Confirmation")
+
+    # Create a label to display the message
+    message_label = tk.Label(popup_window, text="Do you want to remove the following files?", font=font_style)
+    message_label.pack(padx=20, pady=10)
+
+    # Construct the message to display
     files_to_delete = "\n".join([f["file"] for f in error_log])
-    confirmation = messagebox.askquestion(
-        "Confirmation",
-        f"Do you want to delete the erroneous files?\n"
-        f"The following files will be deleted:\n\n{files_to_delete}"
+
+    # Calculate the number of lines in the textbox
+    num_lines = len(files_to_delete.split('\n'))
+
+    # Calculate the width based on the length of the longest filename
+    max_filename_length = max(len(line) for line in files_to_delete.split('\n'))
+    _width = min(max_filename_length, 600)  # Adjust the width dynamically
+
+    # Create a text box to display the list of files to be deleted
+    files_textbox = tk.Text(popup_window, font=font_style, wrap=tk.WORD, height=num_lines, width=_width)
+    files_textbox.insert(tk.END, files_to_delete)
+    files_textbox.configure(state="disabled")
+    files_textbox.pack(padx=20, pady=10)
+
+    # Create a frame for buttons
+    _button_frame = tk.Frame(popup_window)
+    _button_frame.pack(pady=10)
+
+    # Create "Yes" and "No" buttons
+    yes_button = tk.Button(
+        _button_frame, text="Yes", command=lambda: on_confirm_delete(popup_window, error_log),
+        font=font_style, width=10, height=2
     )
-    if confirmation == 'yes':
-        delete_error_files(error_log)
+    yes_button.grid(row=0, column=0, padx=10, pady=5)
+
+    no_button = tk.Button(
+        _button_frame, text="No", command=popup_window.destroy,
+        font=font_style, width=10, height=2
+    )
+    no_button.grid(row=0, column=1, padx=10, pady=5)
+
+    # Center the buttons within the window
+    popup_window.update_idletasks()  # Update the window to get proper size
+
+
+def on_confirm_delete(popup_window, error_log):
+    """
+    Callback function for confirming file deletion.
+
+    Parameters:
+    - popup_window (Tkinter.Toplevel): The popup window.
+    - error_log (list): A list containing dictionaries with 'file' key representing the file path.
+    """
+    delete_error_files(error_log, popup_window)
+    popup_window.destroy()
 
 
 def convert_seconds(seconds):
@@ -137,14 +182,15 @@ def convert_music(source_path, dest_path):
     if num_errors > 0:
         output_text.insert(tk.END, "\nFailed files:\n")
         output_text.insert(tk.END, "\n".join([x['msg'] for x in error_log]) + "\n")
+        line_decoration = '=' * 70
+        output_text.insert(
+            tk.END,
+            f"\n\n{line_decoration}\nTo delete the erroneous files,"
+            f" click the 'Delete Error Files' button.\n{line_decoration}"
+        )
+        delete_button.config(state=tk.NORMAL)
+        delete_button['command'] = lambda: delete_error_files_popup(error_log)
         output_text.see(tk.END)
-        delete_error_files_popup(error_log)
-
-        # output_text.insert(
-        #     tk.END, "\nTo delete the erroneous files, click the 'Delete Error Files' button.\n"
-        # )
-        # delete_button.config(state=tk.NORMAL)
-        # delete_button['command'] = lambda: delete_error_files_popup(error_log)
 
         # output_text.insert(
         #     tk.END, "\nTo delete the erroneous files, execute this command in a terminal:\n"
@@ -272,6 +318,13 @@ convert_button = tk.Button(
     font=BUTTON_FONT, width=BUTTON_WIDTH, height=BUTTON_HEIGHT
 )
 convert_button.pack(side=tk.LEFT, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y)
+
+# Delete Error Files button
+delete_button = tk.Button(
+    button_frame, text="Delete Error Files", command=lambda: delete_error_files_popup([]),
+    font=BUTTON_FONT, width=BUTTON_WIDTH, height=1, state=tk.DISABLED
+)
+delete_button.pack(side=tk.LEFT, padx=BUTTON_PADDING_X, pady=BUTTON_PADDING_Y)
 
 # Exit button
 exit_button = tk.Button(
